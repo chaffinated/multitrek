@@ -1,0 +1,27 @@
+{
+  "presets": [
+    "@babel/preset-typescript",
+    "@babel/preset-react",
+    ["@babel/preset-env",
+      {
+        "targets": {
+          "browsers": ["last 2 versions", "> 2%", "not ie < 11"]
+        }
+      }
+    ]
+  ],
+  "plugins": [
+    "babel-plugin-ramda",
+    ["@babel/plugin-proposal-decorators", {
+      "decoratorsBeforeExport": false
+    }],
+    "@babel/plugin-proposal-class-properties"
+    // ["module-resolver", {
+    //   "root": ["."],
+    //   "alias": {
+    //     "&": ["./src/client"],
+    //     "&&": ["./src/common"]
+    //   }
+    // }]
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "name": "audioplay",
+  "version": "0.1.0",
+  "description": "React-based multitrack audio player",
+  "main": "index.js",
+  "scripts": {
+    "test": "export NODE_ENV=test && babel-tape-runner src/__tests__/index.js | tap-spec",
+    "start": "parcel ./testapp/index.html"
+  },
+  "keywords": [
+    "react",
+    "audio"
+  ],
+  "author": "Dustin M. Chaffin",
+  "license": "ISC",
+  "dependencies": {
+    "emotion": "^10.0.14",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.0.0-0",
+    "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@babel/plugin-proposal-decorators": "^7.4.4",
+    "@babel/preset-env": "^7.5.5",
+    "@babel/preset-react": "^7.0.0",
+    "@babel/preset-typescript": "^7.3.3",
+    "babel-plugin-ramda": "^2.0.0",
+    "node-sass": "^4.11.0",
+    "parcel-bundler": "^1.8.1",
+    "tslint": "^5.18.0",
+    "typedoc": "^0.14.2",
+    "typescript": "^3.0.0"
+  }
+}
