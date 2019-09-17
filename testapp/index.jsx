@@ -1,14 +1,14 @@
 import React from 'react';
 import { render } from 'react-dom';
 import Multitrek from '../src/Multitrek.tsx';
-import softEyesSrc from './audio/dandan-noodles-soft-eyes.mp3';
-import gardyLooSrc from './audio/dandan-noodles-gardyloo.mp3';
+import handingOn from './audio/hanging-on.mp3';
+import timeTraveler from './audio/time-traveler.mp3';
 import './index.scss';
 
 function App() {
   return (
     <div className="screen-wrap">
-      <Multitrek sources={[softEyesSrc, gardyLooSrc]} />
+      <Multitrek sources={[handingOn, timeTraveler]} />
     </div>
   );
 }

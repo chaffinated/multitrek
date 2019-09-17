@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 import { normalizeRMSWaveform } from './utils';
 
 interface WaveformProps {
@@ -19,15 +19,15 @@ function Waveform(props: WaveformProps) {
     const y = HEIGHT - height;
     return <rect key={i} x={x} y={y} width={1} height={height} />
   });
-  
+
   return (
-    <div className="multitrek__waveform">
+    <div className='multitrek__waveform'>
       <svg
         className={muted ? `${SVG_CLASS} ${SVG_CLASS}--muted` : SVG_CLASS}
         height={HEIGHT}
         width={width}
         viewBox={`0 0 ${width} ${HEIGHT}`}
-        preserveAspectRatio="none"
+        preserveAspectRatio='none'
       >
         { bars }
       </svg>

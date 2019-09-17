@@ -1,5 +1,5 @@
 import React from 'react';
-import PlayStates from './PlayStates';
+import PlayStates from './types/PlayStates';
 
 
 interface ControlsProps {
@@ -11,7 +11,7 @@ interface ControlsProps {
 
 function Controls(props: ControlsProps) {
   const { playState, play, stop, pause } = props;
-  const disableStop = [PlayStates.Playing, PlayStates.Stopped].includes(playState);
+  const disableStop = [PlayStates.Playing, PlayStates.Unstarted].includes(playState);
 
   return (
     <div className='multitrek__transport'>
