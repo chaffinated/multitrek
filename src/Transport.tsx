@@ -1,5 +1,5 @@
 import React from 'react';
-import PlayStates from './types/PlayStates';
+import { PlayStates, MultitrekState } from './types';
 
 
 interface ControlsProps {
@@ -7,6 +7,8 @@ interface ControlsProps {
   play: (e: Event) => void;
   stop: (e: Event) => void;
   pause: (e: Event) => void;
+  multitrekState: MultitrekState;
+  dispatch: () => any;
 }
 
 function Controls(props: ControlsProps) {

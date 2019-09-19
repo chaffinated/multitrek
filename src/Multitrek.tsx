@@ -110,8 +110,7 @@ function Multitrek(props: MultitrekProps) {
               onUnmute={unmute(source.key)}
               onSolo={solo(source.key)}
               onUnsolo={unsolo(source.key)}
-            />
-          )
+            />)
         }
       </div>
 
@@ -120,6 +119,8 @@ function Multitrek(props: MultitrekProps) {
         pause={pause}
         play={play}
         stop={stop}
+        multitrekState={state}
+        dispatch={dispatch}
       />
     </div>
   );

@@ -17,7 +17,7 @@ function Waveform(props: WaveformProps) {
     const x = i;
     const height = gain * HEIGHT;
     const y = HEIGHT - height;
-    return <rect key={i} x={x} y={y} width={1} height={height} />
+    return <rect key={i} x={x} y={y} width={1} height={height} />;
   });
 
   return (

@@ -1,4 +1,5 @@
 import React from 'react';
+import cn from 'classnames';
 import PlayStates from './types/PlayStates';
 import { TrackState, TrackMetaState } from './types/TrackState';
 import Waveform from './Waveform';
@@ -64,7 +65,7 @@ function Track(props: TrackProps) {
   }, [playState]);
 
   if (meta == null) {
-    return <div className='multitrek__track'><p>loading</p></div>;
+    return <div className={cn('multitrek__track', 'multitrek__track--loading')}><p>loading</p></div>;
   }
 
   const shouldMakeNoise = (!source.mute && !isSoloOn) || source.solo;
@@ -75,7 +76,7 @@ function Track(props: TrackProps) {
   );
 
   return (
-    <div className='multitrek__track'>
+    <div className={cn('multitrek__track', { 'multitrek__track--muted': shouldMakeNoise })}>
       <div className='multitrek__track__controls'>
         <button
           className={ source.mute ? `${MUTE_BUTTON_CLASS} ${MUTE_BUTTON_CLASS}--active` : MUTE_BUTTON_CLASS}
