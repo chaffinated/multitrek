@@ -3,7 +3,7 @@ $grey: #e6efec;
 
 .multitrek {
   &__tracks {
-    
+    min-height: 12.8rem;
   }
 
   &__track {
@@ -52,6 +52,15 @@ $grey: #e6efec;
           border: 1px solid transparent;
         }
       }
+    }
+
+    &--compare {
+      position: absolute;
+      opacity: 0.8;
+      top: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
     }
   }
 

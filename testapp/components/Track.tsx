@@ -73,11 +73,15 @@ function Track(props: TrackProps) {
   }, [audio, shouldMakeNoise]);
 
   if (meta == null) {
-    return <div className={cn('multitrek__track', 'multitrek__track--loading')}><p>loading</p></div>;
+    return (
+      <div className={cn('multitrek__track', 'multitrek__track--compare', 'multitrek__track--loading')}>
+        <p>loading</p>
+      </div>
+    );
   }
 
   return (
-    <div className={cn('multitrek__track', { 'multitrek__track--muted': !shouldMakeNoise })}>
+    <div className={cn('multitrek__track', 'multitrek__track--compare', { 'multitrek__track--muted': !shouldMakeNoise })}>
       <Waveform
         rms={meta.rms}
         muted={!shouldMakeNoise}
