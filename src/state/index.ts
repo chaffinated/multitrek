@@ -8,24 +8,27 @@ export enum ActionTypes {
   Solo,
   Unsolo,
   Sources,
+  Activate,
   TrackMeta,
   ResetReady,
   ConfirmReady,
   PresentError,
 }
 
-export const initialState = {
+export const initialState: MultitrekState = {
   playState: PlayStates.Unstarted,
   tracks: [],
   meta: {},
-  isReady: false,
   error: null,
+  isReady: false,
+  activated: false,
 };
 
 function trackReducer(state: MultitrekState = initialState, action) {
   switch (action.type) {
     case ActionTypes.SetState:
       return { ...state, playState: action.payload };
+
     case ActionTypes.Mute:
       return produce(state, (draft) => {
         const track = draft.tracks.find(s => s.key === action.payload);
@@ -33,6 +36,7 @@ function trackReducer(state: MultitrekState = initialState, action) {
           track.mute = true;
         }
       });
+
     case ActionTypes.Unmute:
       return produce(state, (draft) => {
         const track = draft.tracks.find(s => s.key === action.payload);
@@ -40,6 +44,7 @@ function trackReducer(state: MultitrekState = initialState, action) {
           track.mute = false;
         }
       });
+
     case ActionTypes.Solo:
       return produce(state, (draft) => {
         const track = draft.tracks.find(s => s.key === action.payload);
@@ -47,6 +52,7 @@ function trackReducer(state: MultitrekState = initialState, action) {
           track.solo = true;
         }
       });
+
     case ActionTypes.Unsolo:
       return produce(state, (draft) => {
         const track = draft.tracks.find(s => s.key === action.payload);
@@ -54,8 +60,10 @@ function trackReducer(state: MultitrekState = initialState, action) {
           track.solo = false;
         }
       });
+
     case ActionTypes.Sources:
       return { ...state, sources: new Set(action.payload) };
+
     case ActionTypes.TrackMeta:
       const { source, meta } = action.payload;
       return produce(state, (draft) => {
@@ -65,12 +73,19 @@ function trackReducer(state: MultitrekState = initialState, action) {
             state.meta[s.source] = meta;
           });
       });
+
+    case ActionTypes.Activate:
+      return { ...state, activated: true };
+
     case ActionTypes.ConfirmReady:
       return { ...state, isReady: true };
+
     case ActionTypes.ResetReady:
       return { ...state, isReady: false };
+
     case ActionTypes.PresentError:
       return { ...state, error: action.payload };
+
     default:
       return state;
   }

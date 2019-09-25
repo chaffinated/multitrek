@@ -8,6 +8,7 @@ interface MultitrekState {
     [key: string]: TrackMetaState,
   };
   isReady: boolean;
+  activated: boolean;
   error: Error | null;
 }
 

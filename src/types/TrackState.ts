@@ -7,5 +7,10 @@ export interface TrackState {
 }
 
 export interface TrackMetaState {
+  buffer: AudioBuffer;
+  length: number;
+  duration: number;
+  sampleRate: number;
+  numberOfChannels: number;
   rms: number[];
 }

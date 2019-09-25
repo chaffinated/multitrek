@@ -8,7 +8,7 @@ interface ControlsProps {
   stop: (e: Event) => void;
   pause: (e: Event) => void;
   multitrekState: MultitrekState;
-  dispatch: () => any;
+  dispatch: (action: any) => any;
 }
 
 function Controls(props: ControlsProps) {

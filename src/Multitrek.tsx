@@ -1,18 +1,20 @@
 import React from 'react';
+import produce from 'immer';
 import { curry } from 'ramda';
-import { TrackState, PlayStates } from './types';
-import Transport from './Transport';
 import Track from './Track';
+import Transport from './Transport';
 import { calculateRMSWaveform } from './utils';
+import { MultitrekState, TrackState, PlayStates } from './types';
 import trackReducer, { initialState, ActionTypes } from './state';
+
 import './styles.scss';
 
 
 interface MultitrekProps {
   height: number;
   sources: string[];
-  track: (any) => any;
-  controls: (any) => any;
+  track: (component: any) => any;
+  controls: (component: any) => any;
 }
 
 const createTrack = (src: string): TrackState => ({
@@ -25,14 +27,15 @@ const createTrack = (src: string): TrackState => ({
 
 function Multitrek(props: MultitrekProps) {
   const { sources, track: TrackComponent } = props;
-  const context = React.useMemo(() => new AudioContext(), []);
-  const [state, dispatch] = React.useReducer(trackReducer, {
+  const [state, dispatch]: [MultitrekState, (any) => any] = React.useReducer(trackReducer, {
     ...initialState,
     tracks: sources.map(createTrack),
   });
-  const isSoloOn = !!state.tracks.find(s => s.soloed);
+  const context = React.useMemo(() => state.activated ? new AudioContext() : null, [state.activated]);
+  const isSoloOn = state.tracks.some(s => s.solo);
 
-  const decodeAudio = curry((source, blob) => new Promise((resolve, reject) => {
+
+  const decodeAudio = curry((source, blob) => new Promise((resolve) => {
     const fileReader = new FileReader();
     fileReader.addEventListener('load', () => {
       context.decodeAudioData(fileReader.result, (d) => {
@@ -41,7 +44,12 @@ function Multitrek(props: MultitrekProps) {
           payload: {
             source,
             meta: {
-              rms: calculateRMSWaveform(d, 512),
+              buffer: d,
+              length: d.length,
+              duration: d.duration,
+              sampleRate: d.sampleRate,
+              numberOfChannels: d.numberOfChannels,
+              rms: [],
             },
           },
         };
@@ -60,7 +68,11 @@ function Multitrek(props: MultitrekProps) {
     });
   };
 
+
   React.useEffect(() => {
+    if (!state.activated) {
+      return;
+    }
     dispatch({ type: ActionTypes.ResetReady });
     const requests = sources.map((source) => {
       if (state.meta[source] != null) {
@@ -73,8 +85,43 @@ function Multitrek(props: MultitrekProps) {
     });
     Promise.all(requests)
       .then(() => dispatch({ type: ActionTypes.ConfirmReady }));
-  }, [sources]);
+  }, [sources, state.activated]);
 
+
+  React.useEffect(() => {
+    if (!state.isReady) {
+      return;
+    }
+    const maxTrackLength = Object.values(state.meta)
+      .reduce((l, track) => {
+        if (track.length && track.length > l) {
+          return track.length;
+        }
+        return l;
+      }, 0);
+
+    Object.entries(state.meta)
+      .forEach(([trackSrc, track]) => {
+        const newMeta = produce(track, (draft) => {
+          if (draft == null) {
+            return;
+          }
+          draft.rms = calculateRMSWaveform(draft.buffer, 512, maxTrackLength);
+        });
+        dispatch({ type: ActionTypes.TrackMeta, payload: { source: trackSrc, meta: newMeta }});
+    });
+  }, [sources, state.isReady]);
+
+  if (!state.activated) {
+    const activate = () => dispatch({ type: ActionTypes.Activate });
+    return (
+      <div className='multitrek' onClick={activate}>
+        <div className='multitrek__loading'>
+          <p>click to activate</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!state.isReady) {
     return (

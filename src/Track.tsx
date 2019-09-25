@@ -46,7 +46,7 @@ function Track(props: TrackProps) {
     sourceNode.connect(gainNode);
     gainNode.connect(context.destination);
     return [a, sourceNode, gainNode];
-  }, [source, context]);
+  }, [source.source, context]);
 
   React.useEffect(() => {
     switch (playState) {
@@ -64,19 +64,21 @@ function Track(props: TrackProps) {
     }
   }, [playState]);
 
+  const shouldMakeNoise = (!source.mute && !isSoloOn) || source.solo;
+
+  React.useEffect(() => {
+    gain.gain.exponentialRampToValueAtTime(
+      shouldMakeNoise ? 1 : 0.0001,
+      audio.currentTime + 0.3,
+    );
+  }, [audio, shouldMakeNoise]);
+
   if (meta == null) {
     return <div className={cn('multitrek__track', 'multitrek__track--loading')}><p>loading</p></div>;
   }
 
-  const shouldMakeNoise = (!source.mute && !isSoloOn) || source.solo;
-
-  gain.gain.exponentialRampToValueAtTime(
-    shouldMakeNoise ? 1 : 0.0001,
-    audio.currentTime + 0.3,
-  );
-
   return (
-    <div className={cn('multitrek__track', { 'multitrek__track--muted': shouldMakeNoise })}>
+    <div className={cn('multitrek__track', { 'multitrek__track--muted': !shouldMakeNoise })}>
       <div className='multitrek__track__controls'>
         <button
           className={ source.mute ? `${MUTE_BUTTON_CLASS} ${MUTE_BUTTON_CLASS}--active` : MUTE_BUTTON_CLASS}
@@ -94,7 +96,7 @@ function Track(props: TrackProps) {
       </div>
 
       {
-        meta.rms != null && <Waveform rms={meta.rms} muted={source.mute} />
+        meta.rms != null && <Waveform rms={meta.rms} muted={!shouldMakeNoise} />
       }
     </div>
   );

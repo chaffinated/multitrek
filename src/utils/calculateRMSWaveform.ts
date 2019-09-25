@@ -1,9 +1,9 @@
 import { range } from 'ramda';
 
-const calculateRMSWaveform = (buffer, bins) => {
+const calculateRMSWaveform = (buffer, bins, length?: number) => {
   const channels = range(0, buffer.numberOfChannels - 1)
     .map(c => buffer.getChannelData(c));
-  const channelLength = channels[0].length;
+  const channelLength = length || channels[0].length;
   const windowLength = Math.floor(channelLength / bins);
   const averages = [];
   const base = Math.floor(channelLength / bins);
@@ -13,13 +13,13 @@ const calculateRMSWaveform = (buffer, bins) => {
 
   while (i < channelLength) {
     if (i % base === 0) {
-      rms = Math.sqrt(sum / (windowLength * channels.length))
+      rms = Math.sqrt(sum / (windowLength * channels.length));
       averages.push(rms);
       sum = 0;
     }
 
     sum += channels.reduce((m, c) => {
-      m += Math.pow(c[i], 2);
+      m += Math.pow(c[i] || 0, 2);
       return m;
     }, 0);
 
