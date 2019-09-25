@@ -67,9 +67,9 @@ function Track(props: TrackProps) {
   const shouldMakeNoise = (!source.mute && !isSoloOn) || source.solo;
 
   React.useEffect(() => {
-    gain.gain.exponentialRampToValueAtTime(
-      shouldMakeNoise ? 1 : 0.0001,
-      audio.currentTime + 0.3,
+    gain.gain.linearRampToValueAtTime(
+      shouldMakeNoise ? 1 : 0.00001,
+      context.currentTime + 0.1,
     );
   }, [audio, shouldMakeNoise]);
 
@@ -95,9 +95,11 @@ function Track(props: TrackProps) {
         </button>
       </div>
 
-      {
-        meta.rms != null && <Waveform rms={meta.rms} muted={!shouldMakeNoise} />
-      }
+      <Waveform
+        rms={meta.rms}
+        muted={!shouldMakeNoise}
+        playState={playState}
+      />
     </div>
   );
 }

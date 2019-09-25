@@ -1,9 +1,11 @@
 import React from 'react';
 import { normalizeRMSWaveform } from './utils';
+import { PlayStates } from './types';
 
 interface WaveformProps {
   rms: number[];
   muted: boolean;
+  playState: PlayStates;
 }
 
 const HEIGHT = 500;

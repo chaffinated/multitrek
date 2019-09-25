@@ -163,11 +163,11 @@ function Multitrek(props: MultitrekProps) {
 
       <Transport
         playState={state.playState}
+        multitrekState={state}
+        dispatch={dispatch}
         pause={pause}
         play={play}
         stop={stop}
-        multitrekState={state}
-        dispatch={dispatch}
       />
     </div>
   );
