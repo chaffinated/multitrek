@@ -27,7 +27,11 @@ const createTrack = (src: string): TrackState => ({
 
 
 function Multitrek(props: MultitrekProps) {
-  const { sources, track: TrackComponent } = props;
+  const {
+    sources,
+    track: TrackComponent,
+    controls: ControlComponent,
+  } = props;
   const [state, dispatch]: [MultitrekState, (any) => any] = React.useReducer(trackReducer, {
     ...initialState,
     tracks: sources.map(createTrack),
@@ -170,7 +174,7 @@ function Multitrek(props: MultitrekProps) {
         }
       </div>
 
-      <Transport
+      <ControlComponent
         playState={state.playState}
         multitrekState={state}
         dispatch={dispatch}

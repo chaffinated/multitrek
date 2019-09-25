@@ -40,7 +40,7 @@ function trackReducer(state: MultitrekState = initialState, action) {
 
     case ActionTypes.Mute:
       return produce(state, (draft) => {
-        const track = draft.tracks.find(s => s.key === action.payload);
+        const track = draft.tracks.find((s) => s.key === action.payload);
         if (track) {
           track.mute = true;
         }
@@ -48,7 +48,7 @@ function trackReducer(state: MultitrekState = initialState, action) {
 
     case ActionTypes.Unmute:
       return produce(state, (draft) => {
-        const track = draft.tracks.find(s => s.key === action.payload);
+        const track = draft.tracks.find((s) => s.key === action.payload);
         if (track) {
           track.mute = false;
         }
@@ -56,7 +56,7 @@ function trackReducer(state: MultitrekState = initialState, action) {
 
     case ActionTypes.Solo:
       return produce(state, (draft) => {
-        const track = draft.tracks.find(s => s.key === action.payload);
+        const track = draft.tracks.find((s) => s.key === action.payload);
         if (track) {
           track.solo = true;
         }
@@ -64,7 +64,7 @@ function trackReducer(state: MultitrekState = initialState, action) {
 
     case ActionTypes.Unsolo:
       return produce(state, (draft) => {
-        const track = draft.tracks.find(s => s.key === action.payload);
+        const track = draft.tracks.find((s) => s.key === action.payload);
         if (track) {
           track.solo = false;
         }
@@ -72,7 +72,7 @@ function trackReducer(state: MultitrekState = initialState, action) {
 
     case ActionTypes.Complete:
       return produce(state, (draft) => {
-        const track = draft.tracks.find(s => s.key === action.payload);
+        const track = draft.tracks.find((s) => s.key === action.payload);
         if (track) {
           track.complete = true;
         }
