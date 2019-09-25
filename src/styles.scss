@@ -62,13 +62,15 @@ $grey: #e6efec;
 
       rect {
         transform-origin: center bottom;
-        transition: all 100ms ease-in-out;
+        transition: all 160ms ease-in-out;
         opacity: 1;
+        transform-origin: center bottom;
       }
 
       &--muted {
         rect {
           opacity: 0.7;
+          transform: scale(1, 0.34);
         }
       }
     }

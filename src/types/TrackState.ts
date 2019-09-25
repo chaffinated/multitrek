@@ -4,6 +4,7 @@ export interface TrackState {
   mute: boolean;
   solo: boolean;
   key: symbol;
+  complete: boolean;
 }
 
 export interface TrackMetaState {

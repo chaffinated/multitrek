@@ -8,6 +8,7 @@ interface TrackProps {
   bins: PowerOf2;
   source: TrackState;
   isSoloOn: boolean;
+  isComplete: boolean;
   meta: TrackMetaState;
   context: AudioContext;
   playState: PlayStates;
@@ -15,6 +16,7 @@ interface TrackProps {
   onUnmute: () => void;
   onSolo: () => void;
   onUnsolo: () => void;
+  onComplete: () => void;
 }
 
 const BUTTON_CLASS = 'multitrek__track__control';
@@ -32,6 +34,7 @@ function Track(props: TrackProps) {
     onUnmute,
     onSolo,
     onUnsolo,
+    onComplete,
   } = props;
 
   const [audio, audioNode, gain] = React.useMemo(() => {
@@ -45,13 +48,17 @@ function Track(props: TrackProps) {
     const gainNode = context.createGain();
     sourceNode.connect(gainNode);
     gainNode.connect(context.destination);
+    a.addEventListener('ended', onComplete);
+
     return [a, sourceNode, gainNode];
   }, [source.source, context]);
 
   React.useEffect(() => {
     switch (playState) {
       case PlayStates.Playing:
-        audio.play();
+        if (!source.complete) {
+          audio.play();
+        }
         break;
       case PlayStates.Unstarted:
       case PlayStates.Ended:

@@ -9,6 +9,7 @@ export enum ActionTypes {
   Unsolo,
   Sources,
   Activate,
+  Complete,
   TrackMeta,
   ResetReady,
   ConfirmReady,
@@ -27,7 +28,15 @@ export const initialState: MultitrekState = {
 function trackReducer(state: MultitrekState = initialState, action) {
   switch (action.type) {
     case ActionTypes.SetState:
-      return { ...state, playState: action.payload };
+      return produce(state, (draft) => {
+        if (
+          action.payload === PlayStates.Unstarted ||
+          action.payload === PlayStates.Ended
+        ) {
+          draft.tracks.forEach((t) => t.complete = false);
+        }
+        draft.playState = action.payload;
+      });
 
     case ActionTypes.Mute:
       return produce(state, (draft) => {
@@ -58,6 +67,14 @@ function trackReducer(state: MultitrekState = initialState, action) {
         const track = draft.tracks.find(s => s.key === action.payload);
         if (track) {
           track.solo = false;
+        }
+      });
+
+    case ActionTypes.Complete:
+      return produce(state, (draft) => {
+        const track = draft.tracks.find(s => s.key === action.payload);
+        if (track) {
+          track.complete = true;
         }
       });
 

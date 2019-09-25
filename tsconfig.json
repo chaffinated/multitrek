@@ -36,7 +36,7 @@
     "src/**/*.js",
     "src/**/*.vue",
     "tests/**/*.ts",
-    "tests/**/*.tsx",
+    "tests/**/*.tsx"
   ],
   "exclude": [
     ".git",

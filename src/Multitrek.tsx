@@ -21,6 +21,7 @@ const createTrack = (src: string): TrackState => ({
   source: src,
   mute: false,
   solo: false,
+  complete: false,
   key: Symbol(src),
 });
 
@@ -33,7 +34,7 @@ function Multitrek(props: MultitrekProps) {
   });
   const context = React.useMemo(() => state.activated ? new AudioContext() : null, [state.activated]);
   const isSoloOn = state.tracks.some(s => s.solo);
-
+  const isComplete = state.tracks.every((t) => t.complete);
 
   const decodeAudio = curry((source, blob) => new Promise((resolve) => {
     const fileReader = new FileReader();
@@ -112,6 +113,12 @@ function Multitrek(props: MultitrekProps) {
     });
   }, [sources, state.isReady]);
 
+
+  React.useEffect(() => {
+    dispatch({ type: ActionTypes.SetState, payload: PlayStates.Ended });
+  }, [isComplete]);
+
+
   if (!state.activated) {
     const activate = () => dispatch({ type: ActionTypes.Activate });
     return (
@@ -136,10 +143,11 @@ function Multitrek(props: MultitrekProps) {
   const play = () => dispatch({ type: ActionTypes.SetState, payload: PlayStates.Playing });
   const stop = () => dispatch({ type: ActionTypes.SetState, payload: PlayStates.Unstarted });
   const pause = () => dispatch({ type: ActionTypes.SetState, payload: PlayStates.Paused });
-  const mute = (source) => () => dispatch({ type: ActionTypes.Mute, payload: source });
-  const solo = (source) => () => dispatch({ type: ActionTypes.Solo, payload: source });
-  const unmute = (source) => () => dispatch({ type: ActionTypes.Unmute, payload: source });
-  const unsolo = (source) => () => dispatch({ type: ActionTypes.Unsolo, payload: source });
+  const mute = (sourceKey) => () => dispatch({ type: ActionTypes.Mute, payload: sourceKey });
+  const solo = (sourceKey) => () => dispatch({ type: ActionTypes.Solo, payload: sourceKey });
+  const unmute = (sourceKey) => () => dispatch({ type: ActionTypes.Unmute, payload: sourceKey });
+  const unsolo = (sourceKey) => () => dispatch({ type: ActionTypes.Unsolo, payload: sourceKey });
+  const complete = (sourceKey) => () => dispatch({ type: ActionTypes.Complete, payload: sourceKey });
 
   return (
     <div className='multitrek'>
@@ -157,6 +165,7 @@ function Multitrek(props: MultitrekProps) {
               onUnmute={unmute(source.key)}
               onSolo={solo(source.key)}
               onUnsolo={unsolo(source.key)}
+              onComplete={complete(source.key)}
             />)
         }
       </div>
