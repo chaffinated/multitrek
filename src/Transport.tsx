@@ -31,7 +31,7 @@ function Controls(props: ControlsProps) {
     setCursorPosition(clientX);
   };
   const handleClick = (e: MouseEvent) => {
-    const { width } = e.currentTarget.getBoundingClientRect();
+    const { width } = (e.currentTarget as HTMLElement).getBoundingClientRect();
     dispatch({ type: ActionTypes.Seek, payload: e.clientX / width * maxTrackDuration });
   };
 

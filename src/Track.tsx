@@ -42,7 +42,8 @@ function Track(props: TrackProps) {
     setTime,
   } = props;
 
-  const [audio, audioNode, gain] = React.useMemo(() => {
+  // get or create an audio and gain node
+  const [audio, gain] = React.useMemo(() => {
     const a = new Audio();
     a.src = source.source;
     if (context == null) {
@@ -55,10 +56,11 @@ function Track(props: TrackProps) {
     gainNode.connect(context.destination);
     a.addEventListener('ended', onComplete);
 
-    return [a, sourceNode, gainNode];
+    return [a, gainNode];
   }, [source.source, context]);
 
 
+  // stop / start audio
   React.useEffect(() => {
     switch (playState) {
       case PlayStates.Playing:
@@ -77,8 +79,9 @@ function Track(props: TrackProps) {
     }
   }, [playState]);
 
-  const shouldMakeNoise = (!source.mute && !isSoloOn) || source.solo;
 
+  // mute / solo / unmute / unsolo audio
+  const shouldMakeNoise = (!source.mute && !isSoloOn) || source.solo;
 
   React.useEffect(() => {
     gain.gain.linearRampToValueAtTime(
@@ -88,6 +91,7 @@ function Track(props: TrackProps) {
   }, [audio, shouldMakeNoise]);
 
 
+  // stop / start audio
   React.useEffect(() => {
     try {
       if (playState === PlayStates.Playing) {
@@ -100,6 +104,7 @@ function Track(props: TrackProps) {
   }, [seekPosition]);
 
 
+  // update multitrek state time on 'timeupdate' play event
   React.useEffect(() => {
     if (setTime == null) {
       return () => { /* no op */ };
@@ -110,6 +115,7 @@ function Track(props: TrackProps) {
   }, [setTime]);
 
 
+  // wait for audio to load
   if (meta == null) {
     return <div className={cn('multitrek__track', 'multitrek__track--loading')}><p>loading</p></div>;
   }

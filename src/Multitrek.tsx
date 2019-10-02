@@ -37,6 +37,7 @@ function Multitrek(props: MultitrekProps) {
   const isComplete = state.tracks.every((t) => t.complete);
 
 
+  // "method" to get audio data + metadata
   const decodeAudio = curry((source, blob) => new Promise((resolve) => {
     const fileReader = new FileReader();
     const setTrackMeta = (d) => {
@@ -64,6 +65,7 @@ function Multitrek(props: MultitrekProps) {
   }));
 
 
+  //
   const handleLoadError = (error) => {
     console.warn(error);
     dispatch({
@@ -73,6 +75,7 @@ function Multitrek(props: MultitrekProps) {
   };
 
 
+  // request audio data & decode
   React.useEffect(() => {
     if (!state.activated) {
       return;
@@ -92,6 +95,7 @@ function Multitrek(props: MultitrekProps) {
   }, [sources, state.activated]);
 
 
+  // "computed" value of longest track (for reference)
   const longestTrack = React.useMemo(() => {
     if (!state.isReady) {
       return null;
@@ -108,6 +112,8 @@ function Multitrek(props: MultitrekProps) {
   const maxTrackLength = (longestTrack && longestTrack.length) || 0;
   const maxTrackDuration = (longestTrack && longestTrack.duration) || 0;
 
+
+  // calculate waveform after audio is loaded
   React.useEffect(() => {
     if (!state.isReady) {
       return;
@@ -125,6 +131,7 @@ function Multitrek(props: MultitrekProps) {
   }, [sources, state.isReady]);
 
 
+  // on load and when all tracks are complete, end play state
   React.useEffect(() => {
     dispatch({ type: ActionTypes.SetState, payload: PlayStates.Ended });
   }, [isComplete]);
