@@ -9,6 +9,7 @@ import trackReducer, { initialState, ActionTypes } from './state';
 
 import './styles.scss';
 
+const AC = window.AudioContext || window.webkitAudioContext;
 
 interface MultitrekProps {
   height: number;
@@ -32,7 +33,7 @@ function Multitrek(props: MultitrekProps) {
     ...initialState,
     tracks: sources.map(createTrack),
   });
-  const context = React.useMemo(() => state.activated ? new AudioContext() : null, [state.activated]);
+  const context = React.useMemo(() => state.activated ? new AC() : null, [state.activated]);
   const isSoloOn = state.tracks.some(s => s.solo);
   const isComplete = state.tracks.every((t) => t.complete);
 

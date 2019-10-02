@@ -28,11 +28,12 @@ function Controls(props: ControlsProps) {
   const handleMouseLeave = () => setShouldCursorDisplay(false);
   const handleMouseMove = (e: MouseEvent) => {
     const { clientX } = e;
-    setCursorPosition(clientX);
+    const { left } = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    setCursorPosition(clientX - left);
   };
   const handleClick = (e: MouseEvent) => {
-    const { width } = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    dispatch({ type: ActionTypes.Seek, payload: e.clientX / width * maxTrackDuration });
+    const { left, width } = (e.currentTarget as HTMLElement).getBoundingClientRect();
+    dispatch({ type: ActionTypes.Seek, payload: (e.clientX - left) / width * maxTrackDuration });
   };
 
   return (
