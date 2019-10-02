@@ -4,11 +4,13 @@ import PlayStates from './types/PlayStates';
 import { TrackState, TrackMetaState } from './types/TrackState';
 import Waveform from './Waveform';
 
+
 interface TrackProps {
   bins: PowerOf2;
   source: TrackState;
   isSoloOn: boolean;
   isComplete: boolean;
+  seekPosition: number;
   meta: TrackMetaState;
   context: AudioContext;
   playState: PlayStates;
@@ -17,6 +19,7 @@ interface TrackProps {
   onSolo: () => void;
   onUnsolo: () => void;
   onComplete: () => void;
+  setTime: (audio: any) => void;
 }
 
 const BUTTON_CLASS = 'multitrek__track__control';
@@ -35,6 +38,8 @@ function Track(props: TrackProps) {
     onSolo,
     onUnsolo,
     onComplete,
+    seekPosition,
+    setTime,
   } = props;
 
   const [audio, audioNode, gain] = React.useMemo(() => {
@@ -52,6 +57,7 @@ function Track(props: TrackProps) {
 
     return [a, sourceNode, gainNode];
   }, [source.source, context]);
+
 
   React.useEffect(() => {
     switch (playState) {
@@ -73,12 +79,36 @@ function Track(props: TrackProps) {
 
   const shouldMakeNoise = (!source.mute && !isSoloOn) || source.solo;
 
+
   React.useEffect(() => {
     gain.gain.linearRampToValueAtTime(
       shouldMakeNoise ? 1 : 0.00001,
       context.currentTime + 0.1,
     );
   }, [audio, shouldMakeNoise]);
+
+
+  React.useEffect(() => {
+    try {
+      if (playState === PlayStates.Playing) {
+        audio.play();
+      }
+      audio.currentTime = seekPosition;
+    } catch (err) {
+      console.warn(err);
+    }
+  }, [seekPosition]);
+
+
+  React.useEffect(() => {
+    if (setTime == null) {
+      return () => { /* no op */ };
+    }
+    const updateTime = setTime(audio);
+    audio.addEventListener('timeupdate', updateTime);
+    return () => audio.removeEventListener('timeupdate', updateTime);
+  }, [setTime]);
+
 
   if (meta == null) {
     return <div className={cn('multitrek__track', 'multitrek__track--loading')}><p>loading</p></div>;

@@ -10,6 +10,8 @@ interface MultitrekState {
   isReady: boolean;
   activated: boolean;
   error: Error | null;
+  currentTime: number;
+  seekPosition: number;
 }
 
 export default MultitrekState;

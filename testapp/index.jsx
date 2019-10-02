@@ -14,8 +14,8 @@ function App() {
   return (
     <div className="screen-wrap">
       <Multitrek
-        controls={Transport}
-        track={Track}
+        // controls={Transport}
+        // track={Track}
         sources={[
           handingOn,
           timeTraveler,

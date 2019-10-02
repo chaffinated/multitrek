@@ -27,11 +27,7 @@ const createTrack = (src: string): TrackState => ({
 
 
 function Multitrek(props: MultitrekProps) {
-  const {
-    sources,
-    track: TrackComponent,
-    controls: ControlComponent,
-  } = props;
+  const { sources, track: TrackComponent, controls: ControlComponent } = props;
   const [state, dispatch]: [MultitrekState, (any) => any] = React.useReducer(trackReducer, {
     ...initialState,
     tracks: sources.map(createTrack),
@@ -40,30 +36,33 @@ function Multitrek(props: MultitrekProps) {
   const isSoloOn = state.tracks.some(s => s.solo);
   const isComplete = state.tracks.every((t) => t.complete);
 
+
   const decodeAudio = curry((source, blob) => new Promise((resolve) => {
     const fileReader = new FileReader();
-    fileReader.addEventListener('load', () => {
-      context.decodeAudioData(fileReader.result, (d) => {
-        const action = {
-          type: ActionTypes.TrackMeta,
-          payload: {
-            source,
-            meta: {
-              buffer: d,
-              length: d.length,
-              duration: d.duration,
-              sampleRate: d.sampleRate,
-              numberOfChannels: d.numberOfChannels,
-              rms: [],
-            },
+    const setTrackMeta = (d) => {
+      const action = {
+        type: ActionTypes.TrackMeta,
+        payload: {
+          source,
+          meta: {
+            buffer: d,
+            length: d.length,
+            duration: d.duration,
+            sampleRate: d.sampleRate,
+            numberOfChannels: d.numberOfChannels,
+            rms: [],
           },
-        };
-        dispatch(action);
-        resolve(fileReader.result);
-      });
+        },
+      };
+      dispatch(action);
+      resolve(fileReader.result);
+    };
+    fileReader.addEventListener('load', () => {
+      context.decodeAudioData(fileReader.result, setTrackMeta);
     });
     fileReader.readAsArrayBuffer(blob);
   }));
+
 
   const handleLoadError = (error) => {
     console.warn(error);
@@ -84,7 +83,7 @@ function Multitrek(props: MultitrekProps) {
         return Promise.resolve();
       }
       return fetch(source)
-        .then(res => res.blob())
+        .then((res) => res.blob())
         .then(decodeAudio(source))
         .catch(handleLoadError);
     });
@@ -93,18 +92,26 @@ function Multitrek(props: MultitrekProps) {
   }, [sources, state.activated]);
 
 
+  const longestTrack = React.useMemo(() => {
+    if (!state.isReady) {
+      return null;
+    }
+    return Object.values(state.meta)
+      .reduce((l, track) => {
+        if (l == null || track.duration && track.duration > l.duration) {
+          return track;
+        }
+        return l;
+      }, null);
+  });
+
+  const maxTrackLength = (longestTrack && longestTrack.length) || 0;
+  const maxTrackDuration = (longestTrack && longestTrack.duration) || 0;
+
   React.useEffect(() => {
     if (!state.isReady) {
       return;
     }
-    const maxTrackLength = Object.values(state.meta)
-      .reduce((l, track) => {
-        if (track.length && track.length > l) {
-          return track.length;
-        }
-        return l;
-      }, 0);
-
     Object.entries(state.meta)
       .forEach(([trackSrc, track]) => {
         const newMeta = produce(track, (draft) => {
@@ -152,6 +159,7 @@ function Multitrek(props: MultitrekProps) {
   const unmute = (sourceKey) => () => dispatch({ type: ActionTypes.Unmute, payload: sourceKey });
   const unsolo = (sourceKey) => () => dispatch({ type: ActionTypes.Unsolo, payload: sourceKey });
   const complete = (sourceKey) => () => dispatch({ type: ActionTypes.Complete, payload: sourceKey });
+  const setTime = (audio) => () => dispatch({ type: ActionTypes.SetTime, payload: audio.currentTime });
 
   return (
     <div className='multitrek'>
@@ -164,18 +172,22 @@ function Multitrek(props: MultitrekProps) {
               context={context}
               meta={state.meta[source.source]}
               playState={state.playState}
+              seekPosition={state.seekPosition}
               isSoloOn={isSoloOn}
               onMute={mute(source.key)}
               onUnmute={unmute(source.key)}
               onSolo={solo(source.key)}
               onUnsolo={unsolo(source.key)}
               onComplete={complete(source.key)}
+              setTime={state.meta[source.source] === longestTrack ? setTime : null }
             />)
         }
       </div>
 
       <ControlComponent
         playState={state.playState}
+        maxTrackLength={maxTrackLength}
+        maxTrackDuration={maxTrackDuration}
         multitrekState={state}
         dispatch={dispatch}
         pause={pause}

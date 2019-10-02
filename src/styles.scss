@@ -2,6 +2,8 @@
 $grey: #e6efec;
 
 .multitrek {
+  position: relative;
+
   &__tracks {
     min-height: 12.8rem;
   }
@@ -14,6 +16,7 @@ $grey: #e6efec;
     &__controls {
       padding: 2rem;
       position: absolute;
+      z-index: 100;
       left: 0;
       height: 100%;
       display: flex;
@@ -87,5 +90,49 @@ $grey: #e6efec;
 
   &__transport {
     display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: space-between;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 90;
+
+    &__controls {
+      flex-shrink: 0;
+      display: flex;
+    }
+    
+    &__hud {
+      flex-shrink: 0;
+      flex-basis: 100%;
+      height: 100%;
+      width: 100%;
+    }
+
+    &__playhead,
+    &__cursor {
+      position: absolute;
+      top: 0;
+      left: 100px;
+      width: 2px;
+      height: 100%;
+      border: 0;
+      border-left-width: 1px;
+      border-left-style: solid;
+    }
+
+    &__playhead {
+      border-color: #505050;
+      mix-blend-mode: difference;
+      pointer-events: none;
+    }
+    
+    &__cursor {
+      border-color: #909090;
+      mix-blend-mode: overlay;
+    }
   }
 }

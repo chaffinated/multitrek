@@ -3,6 +3,8 @@ import produce from 'immer';
 
 export enum ActionTypes {
   SetState,
+  SetTime,
+  Seek,
   Mute,
   Unmute,
   Solo,
@@ -23,6 +25,8 @@ export const initialState: MultitrekState = {
   error: null,
   isReady: false,
   activated: false,
+  currentTime: 0,
+  seekPosition: 0,
 };
 
 function trackReducer(state: MultitrekState = initialState, action) {
@@ -102,6 +106,12 @@ function trackReducer(state: MultitrekState = initialState, action) {
 
     case ActionTypes.PresentError:
       return { ...state, error: action.payload };
+
+    case ActionTypes.Seek:
+      return { ...state, seekPosition: action.payload };
+
+    case ActionTypes.SetTime:
+      return { ...state, currentTime: action.payload };
 
     default:
       return state;
