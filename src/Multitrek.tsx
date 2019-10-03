@@ -171,6 +171,17 @@ function Multitrek(props: MultitrekProps) {
 
   return (
     <div className='multitrek'>
+      <ControlComponent
+        playState={state.playState}
+        maxTrackLength={maxTrackLength}
+        maxTrackDuration={maxTrackDuration}
+        multitrekState={state}
+        dispatch={dispatch}
+        pause={pause}
+        play={play}
+        stop={stop}
+      />
+
       <div className='multitrek__tracks'>
         {
           state.tracks.map((source, i) =>
@@ -191,17 +202,6 @@ function Multitrek(props: MultitrekProps) {
             />)
         }
       </div>
-
-      <ControlComponent
-        playState={state.playState}
-        maxTrackLength={maxTrackLength}
-        maxTrackDuration={maxTrackDuration}
-        multitrekState={state}
-        dispatch={dispatch}
-        pause={pause}
-        play={play}
-        stop={stop}
-      />
     </div>
   );
 }

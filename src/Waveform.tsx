@@ -15,13 +15,15 @@ const SVG_CLASS = `multitrek__waveform__svg`;
 function Waveform(props: WaveformProps) {
   const { rms, muted } = props;
   const width = rms.length;
-  const normalizedWaveform = normalizeRMSWaveform(rms);
-  const bars = normalizedWaveform.map((gain, i) => {
-    const x = i;
-    const height = gain * HEIGHT;
-    const y = HALF_HEIGHT - height / 2;
-    return <rect className={`${SVG_CLASS}__sample`} key={i} x={x} y={y} width={1} height={height} />;
-  });
+  const bars = React.useMemo(() => {
+    const normalizedWaveform = normalizeRMSWaveform(rms);
+    return normalizedWaveform.map((gain, i) => {
+      const x = i;
+      const height = gain * HEIGHT;
+      const y = HALF_HEIGHT - height / 2;
+      return <rect className={`${SVG_CLASS}__sample`} key={i} x={x} y={y} width={1} height={height} />;
+    });
+  }, [rms]);
 
   return (
     <div className='multitrek__waveform'>

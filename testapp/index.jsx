@@ -10,19 +10,17 @@ import Tom from './audio/drums/tom.mp3';
 import Hat from './audio/drums/hat.mp3';
 import './index.scss';
 
+import * as tracks from './audio/multi/*.mp3';
+
+const sources = Object.values(tracks).filter((s) => typeof s === 'string');
+
 function App() {
   return (
     <div className="screen-wrap">
       <Multitrek
-        // controls={Transport}
-        // track={Track}
-        sources={[
-          handingOn,
-          timeTraveler,
-          // Snare,
-          // Tom,
-          // Hat,
-        ]}
+        controls={Transport}
+        track={Track}
+        sources={sources.slice(5, 15)}
       />
     </div>
   );

@@ -4,11 +4,13 @@ import PlayStates from '../../src/types/PlayStates';
 import { TrackState, TrackMetaState } from '../../src/types/TrackState';
 import Waveform from '../../src/Waveform';
 
+
 interface TrackProps {
   bins: PowerOf2;
   source: TrackState;
   isSoloOn: boolean;
   isComplete: boolean;
+  seekPosition: number;
   meta: TrackMetaState;
   context: AudioContext;
   playState: PlayStates;
@@ -17,7 +19,10 @@ interface TrackProps {
   onSolo: () => void;
   onUnsolo: () => void;
   onComplete: () => void;
+  setTime: (audio: any) => void;
 }
+
+const BUTTON_CLASS = 'multitrek__track__control';
 
 function Track(props: TrackProps) {
   const {
@@ -26,10 +31,17 @@ function Track(props: TrackProps) {
     playState,
     meta,
     isSoloOn,
+    onMute,
+    onUnmute,
+    onSolo,
+    onUnsolo,
     onComplete,
+    seekPosition,
+    setTime,
   } = props;
 
-  const [audio, audioNode, gain] = React.useMemo(() => {
+  // get or create an audio and gain node
+  const [audio, gain] = React.useMemo(() => {
     const a = new Audio();
     a.src = source.source;
     if (context == null) {
@@ -42,9 +54,11 @@ function Track(props: TrackProps) {
     gainNode.connect(context.destination);
     a.addEventListener('ended', onComplete);
 
-    return [a, sourceNode, gainNode];
+    return [a, gainNode];
   }, [source.source, context]);
 
+
+  // stop / start audio
   React.useEffect(() => {
     switch (playState) {
       case PlayStates.Playing:
@@ -63,6 +77,8 @@ function Track(props: TrackProps) {
     }
   }, [playState]);
 
+
+  // mute / solo / unmute / unsolo audio
   const shouldMakeNoise = (!source.mute && !isSoloOn) || source.solo;
 
   React.useEffect(() => {
@@ -72,6 +88,32 @@ function Track(props: TrackProps) {
     );
   }, [audio, shouldMakeNoise]);
 
+
+  // stop / start audio
+  React.useEffect(() => {
+    try {
+      if (playState === PlayStates.Playing) {
+        audio.play();
+      }
+      audio.currentTime = seekPosition;
+    } catch (err) {
+      console.warn(err);
+    }
+  }, [seekPosition]);
+
+
+  // update multitrek state time on 'timeupdate' play event
+  React.useEffect(() => {
+    if (setTime == null) {
+      return () => { /* no op */ };
+    }
+    const updateTime = setTime(audio);
+    audio.addEventListener('timeupdate', updateTime);
+    return () => audio.removeEventListener('timeupdate', updateTime);
+  }, [setTime]);
+
+
+  // wait for audio to load
   if (meta == null) {
     return (
       <div className={cn('multitrek__track', 'multitrek__track--compare', 'multitrek__track--loading')}>
@@ -81,7 +123,9 @@ function Track(props: TrackProps) {
   }
 
   return (
-    <div className={cn('multitrek__track', 'multitrek__track--compare', { 'multitrek__track--muted': !shouldMakeNoise })}>
+    <div
+      className={cn('multitrek__track', 'multitrek__track--compare', { 'multitrek__track--muted': !shouldMakeNoise })}
+    >
       <Waveform
         rms={meta.rms}
         muted={!shouldMakeNoise}

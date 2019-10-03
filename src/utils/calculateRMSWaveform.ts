@@ -1,7 +1,7 @@
 import { range } from 'ramda';
 
 const calculateRMSWaveform = (buffer, windowLength, rmsLength?: number) => {
-  const channels = range(0, buffer.numberOfChannels - 1)
+  const channels = range(0, buffer.numberOfChannels)
     .map((c) => buffer.getChannelData(c));
 
   const bufferLength = channels[0].length;

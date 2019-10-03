@@ -1,4 +1,9 @@
 
+$black-blue: rgb(0, 5, 16);
+$grey: #e6efec;
+$grey-dark: rgb(159, 162, 172);
+$shadow: -4px 8px 16px 8px rgba($grey-dark, 0.4);
+
 html {
   font-size: 62.5%;
 }
@@ -10,4 +15,38 @@ body {
 
 * {
   box-sizing: border-box;
+}
+
+.multitrek {
+  border: 1px solid $grey;
+
+  &__controls {
+    padding: 1.2rem;
+  }
+
+  &__tracks {
+    position: relative;
+    height: 16rem;
+  }
+
+  &__track {
+    background-color: transparent;
+    box-shadow: none;
+    border: 0;
+  }
+
+  &__transport {
+    position: relative;
+    display: block;
+    width: 100%;
+    
+    &__hud {
+      position: absolute;
+      height: 16rem;
+      bottom: -16rem;
+      left: 0;
+      right: 0;
+    }
+  }
+
 }
