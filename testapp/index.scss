@@ -24,6 +24,19 @@ body {
     padding: 1.2rem;
   }
 
+  &__control {
+    background: rgb(252, 249, 255);
+    border-color: $grey-dark;
+    border-radius: 0.8rem;
+    padding: 1.6rem;
+    margin: 0 1.6rem;
+
+    &__icon {
+      width: 4rem;
+      height: 4rem;
+    }
+  }
+
   &__tracks {
     position: relative;
     height: 16rem;
@@ -49,4 +62,8 @@ body {
     }
   }
 
+  &__knob {
+    width: 100%;
+    height: 10rem;
+  }
 }

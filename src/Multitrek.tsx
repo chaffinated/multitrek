@@ -4,7 +4,7 @@ import { curry } from 'ramda';
 import Track from './Track';
 import Transport from './Transport';
 import { calculateRMSWaveform } from './utils';
-import { MultitrekState, TrackState, PlayStates } from './types';
+import { MultitrekState, TrackState, PlayStates, ActionType } from './types';
 import trackReducer, { initialState, ActionTypes } from './state';
 
 import './styles.scss';
@@ -29,12 +29,12 @@ const createTrack = (src: string): TrackState => ({
 
 function Multitrek(props: MultitrekProps) {
   const { sources, track: TrackComponent, controls: ControlComponent } = props;
-  const [state, dispatch]: [MultitrekState, (any) => any] = React.useReducer(trackReducer, {
+  const [state, dispatch]: [MultitrekState, (action: ActionType) => any] = React.useReducer(trackReducer, {
     ...initialState,
     tracks: sources.map(createTrack),
   });
   const context = React.useMemo(() => state.activated ? new AC() : null, [state.activated]);
-  const isSoloOn = state.tracks.some(s => s.solo);
+  const isSoloOn = state.tracks.some((s) => s.solo);
   const isComplete = state.tracks.every((t) => t.complete);
 
 

@@ -14,4 +14,9 @@ interface MultitrekState {
   seekPosition: number;
 }
 
+export interface ActionType {
+  type: string | number;
+  payload?: any;
+}
+
 export default MultitrekState;
