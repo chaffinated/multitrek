@@ -99,6 +99,10 @@ $breakpoints: (
       right: 0;
       width: 100%;
     }
+
+    &--recording {
+      background-color: pink;
+    }
   }
 
   &__waveform {

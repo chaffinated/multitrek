@@ -1,6 +1,6 @@
 import React from 'react';
 import { render } from 'react-dom';
-import Multitrek, { Track, Transport } from '../src';
+import Multitrek, { Track, RecordingTrack, Transport } from '../src';
 // import Transport from './components/Transport.tsx';
 // import Track from './components/Track.tsx';
 // import handingOn from './audio/hanging-on.mp3';
@@ -28,6 +28,7 @@ function App() {
           {
             masteredSources.map((source) => <Track key={source} source={source} />)
           }
+          <RecordingTrack />
         </div>
       </Multitrek>
     </div>
