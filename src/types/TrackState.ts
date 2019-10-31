@@ -14,4 +14,6 @@ export interface TrackMetaState {
   sampleRate: number;
   numberOfChannels: number;
   rms: number[];
+  fetching: boolean;
+  error?: Error;
 }

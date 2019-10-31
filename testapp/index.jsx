@@ -1,11 +1,11 @@
 import React from 'react';
 import { render } from 'react-dom';
-import Multitrek from '../src/Multitrek.tsx';
-import Transport from './components/Transport.tsx';
-import Track from './components/Track.tsx';
+import Multitrek, { Track, Transport } from '../src';
+// import Transport from './components/Transport.tsx';
+// import Track from './components/Track.tsx';
 // import handingOn from './audio/hanging-on.mp3';
 // import timeTraveler from './audio/time-traveler.mp3';
-import './index.scss';
+// import './index.scss';
 
 // import * as tracks from './audio/multi/*.mp3';
 import * as mastered from './audio/mastered/*.mp3';
@@ -16,11 +16,20 @@ const masteredSources = Object.values(mastered).filter((s) => typeof s === 'stri
 function App() {
   return (
     <div className="screen-wrap">
-      <Multitrek
+      {/* <Multitrek
         controls={Transport}
         track={Track}
         sources={masteredSources}
-      />
+      /> */}
+
+      <Multitrek>
+        <Transport />
+        <div className='multitrek__tracks'>
+          {
+            masteredSources.map((source) => <Track key={source} source={source} />)
+          }
+        </div>
+      </Multitrek>
     </div>
   );
 }

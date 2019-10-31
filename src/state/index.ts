@@ -9,10 +9,10 @@ export enum ActionTypes {
   Unmute,
   Solo,
   Unsolo,
-  Sources,
   Activate,
   Complete,
-  TrackMeta,
+  AddTrack,
+  SetTrackMeta,
   ResetReady,
   ConfirmReady,
   PresentError,
@@ -82,17 +82,17 @@ function trackReducer(state: MultitrekState = initialState, action) {
         }
       });
 
-    case ActionTypes.Sources:
-      return { ...state, sources: new Set(action.payload) };
+    case ActionTypes.AddTrack:
+      return produce(state, (draft) => {
+        if (!draft.tracks.includes(action.payload)) {
+          draft.tracks.push(action.payload);
+        }
+      });
 
-    case ActionTypes.TrackMeta:
+    case ActionTypes.SetTrackMeta:
       const { source, meta } = action.payload;
       return produce(state, (draft) => {
-        draft.tracks
-          .filter(s => s.source === source)
-          .forEach((s) => {
-            state.meta[s.source] = meta;
-          });
+        draft.meta[source] = meta;
       });
 
     case ActionTypes.Activate:

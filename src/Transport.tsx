@@ -1,23 +1,13 @@
-import React from 'react';
-import { PlayStates, MultitrekState } from './types';
+import React, { useContext } from 'react';
+import { PlayStates } from './types';
+import MultitrekContext from './MultitrekContext';
 import { ActionTypes } from './state';
 
 
-interface ControlsProps {
-  playState: PlayStates;
-  play: (e: Event) => void;
-  stop: (e: Event) => void;
-  pause: (e: Event) => void;
-  maxTrackLength: number;
-  maxTrackDuration: number;
-  multitrekState: MultitrekState;
-  dispatch: (action: any) => any;
-}
-
-
-function Controls(props: ControlsProps) {
-  const { playState, play, stop, pause, dispatch, maxTrackDuration, multitrekState } = props;
-  const { currentTime } = multitrekState;
+function Controls() {
+  const multitrekContext = useContext(MultitrekContext);
+  const { state, play, pause, stop, dispatch, maxTrackDuration } = multitrekContext;
+  const { playState, currentTime } = state;
   const playheadPosition = currentTime / maxTrackDuration * 100;
   const disableStop = [PlayStates.Playing, PlayStates.Unstarted].includes(playState);
 
