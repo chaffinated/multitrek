@@ -98,7 +98,7 @@ export default ({ source }: TrackProps) => {
         rms: calculateRMSWaveform(meta.buffer, 512, maxTrackLength),
       },
     });
-  }, [isReady, maxTrackLength, track]);
+  }, [isReady, maxTrackLength, track.source]);
 
   // get or create an audio and gain node
   const [audio, gain] = useMemo(() => {

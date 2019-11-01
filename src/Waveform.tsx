@@ -17,12 +17,17 @@ function Waveform(props: WaveformProps) {
   const width = rms.length;
   const bars = React.useMemo(() => {
     const normalizedWaveform = normalizeRMSWaveform(rms);
-    return normalizedWaveform.map((gain, i) => {
-      const x = i;
-      const height = gain * HEIGHT;
-      const y = HALF_HEIGHT - height / 2;
-      return <rect className={`${SVG_CLASS}__sample`} key={i} x={x} y={y} width={1} height={height} />;
-    });
+    const res = [];
+    let x;
+    let height;
+    let y;
+    for (let i = 0; i < normalizedWaveform.length; i++) {
+      x = i;
+      height = normalizedWaveform[i] * HEIGHT;
+      y = HALF_HEIGHT - height / 2;
+      res.push(<rect className={`${SVG_CLASS}__sample`} key={i} x={x} y={y} width={1} height={height} />);
+    }
+    return res;
   }, [rms]);
 
   return (

@@ -1,13 +1,11 @@
-import { range } from 'ramda';
 
 const calculateRMSWaveform = (buffer, windowLength, rmsLength?: number) => {
-  const channels = range(0, buffer.numberOfChannels)
-    .map((c) => buffer.getChannelData(c));
-
-  const bufferLength = channels[0].length;
+  const channel = buffer.getChannelData(0);
+  const bufferLength = channel.length;
   const length = rmsLength || bufferLength;
   const windowSize = Math.floor(length / windowLength);
   const averages = [];
+  // const now = Date.now();
 
   let i = 0;
   let sum = 0;
@@ -15,19 +13,17 @@ const calculateRMSWaveform = (buffer, windowLength, rmsLength?: number) => {
 
   while (i < length) {
     if (i % windowSize === 0) {
-      rms = Math.sqrt(sum / (windowSize * channels.length));
+      rms = Math.sqrt(sum / windowSize);
       averages.push(rms);
       sum = 0;
     }
 
-    sum += channels.reduce((m, c) => {
-      m += Math.pow(c[i] || 0, 2);
-      return m;
-    }, 0);
-
+    sum += Math.pow(channel[i] || 0, 2);
     i++;
   }
 
+  // const later = Date.now();
+  // console.debug(`rendered in ${later - now} ms`);
   return averages;
 };
 
