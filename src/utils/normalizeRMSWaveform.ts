@@ -1,14 +1,8 @@
 
 const normalize = (waveform) => {
-  const max = waveform.reduce((currentMax, sample) => {
-    if (sample > currentMax) {
-      return sample;
-    }
-    return currentMax;
-  }, 0.001);
-
+  const max = Math.max.apply(Math, waveform);
   const scalar = 1 / max;
-  return waveform.map((sample) => sample * scalar);
+  return waveform.map((s) => s * scalar);
 };
 
 export default normalize;

@@ -1,4 +1,5 @@
 import { useContext, useMemo, useEffect, useState } from 'react';
+import RecordRTC, { StereoAudioRecorder } from 'recordrtc';
 import MultitrekContext from '../MultitrekContext';
 import { TrackState, TrackMetaState, PlayStates } from '../types';
 import { calculateRMSWaveform } from '../utils';
@@ -21,6 +22,17 @@ const createTrackMeta = (fetching, buffer?: any): TrackMetaState => ({
   rms: [],
 });
 
+const appendBuffer = (ctx: AudioContext, buf1: AudioBuffer, buf2: AudioBuffer) => {
+  const numberOfChannels = Math.min(buf1.numberOfChannels, buf2.numberOfChannels );
+  const tmp = ctx.createBuffer(numberOfChannels, (buf1.length + buf2.length), buf1.sampleRate);
+  for (let i = 0; i < numberOfChannels; i++) {
+    const channel = tmp.getChannelData(i);
+    channel.set(buf1.getChannelData(i), 0);
+    channel.set(buf2.getChannelData(i), buf1.length);
+  }
+  return tmp;
+};
+
 
 export default () => {
   const multitrekContext = useContext(MultitrekContext);
@@ -32,11 +44,8 @@ export default () => {
     unmute,
     complete,
     context,
-    // isReady,
-    // isSoloOn,
     addTrack,
     setTrackMeta,
-    // longestTrack,
     maxTrackLength,
   } = multitrekContext;
   const { playState } = state;
@@ -51,7 +60,8 @@ export default () => {
   const onComplete = complete(key);
   const [recorder, setRecorder] = useState(null);
   const [enabledMic, setEnabledMic] = useState(null);
-  const [audioChunks, setAudioChunks] = useState([]);
+  const [audioChunk, setAudioChunk] = useState(null);
+  const [audioBuffer, setAudioBuffer] = useState(context.createBuffer(1, 1, 44100));
 
   // if source is present and multitrek is activated, fetch audio
   useEffect(() => {
@@ -62,93 +72,97 @@ export default () => {
     setTrackMeta({ source: key, meta: createTrackMeta(false) });
   }, [key, state.activated]);
 
-
-  const onFinish = () => {
-    setAudioChunks((chunks) => {
-      console.log('finished recording', chunks);
-      const newBlob = new Blob(chunks, { type: 'audio/webm;codecs=opus' });
-      decodeBlob(newBlob);
-      setAudioChunks(() => []);
-    });
-  };
-
-  // "method" to get audio data + metadata
-  const decodeBlob = (blob) => new Promise((resolve) => {
-    const fileReader = new FileReader();
-    const dispatchTrackMeta = (d) => {
-      const waveform = calculateRMSWaveform(d, 512, maxTrackLength);
-      const newMeta = {
-        ...createTrackMeta(false, d),
-        rms: waveform,
-      };
-      setTrackMeta({ source: key, meta: newMeta });
-      resolve(fileReader.result);
-    };
-    const handleError = (err) => console.warn(err);
-    const onBlob = () => {
-      context.decodeAudioData(fileReader.result, dispatchTrackMeta, handleError);
-    };
-    fileReader.addEventListener('load', onBlob);
-    fileReader.readAsArrayBuffer(blob);
-  });
-
-
-  const appendAudioChunks = (event) => {
-    setAudioChunks((chunks) => {
-      const blobs = chunks.concat(event.data);
-      const newBlob = new Blob(blobs, { type: 'audio/webm;codecs=opus' });
-      decodeBlob(newBlob);
-      return blobs;
-    });
-  };
-
-
+  // request mic permissions and create recorder
   useEffect(() => {
     if (recorder != null) {
       return;
     }
 
-    window.navigator.mediaDevices.getUserMedia({ audio: true })
+    window.navigator.mediaDevices.getUserMedia({
+      audio: {
+        channelCount: 2,
+        sampleRate: 48000,
+        echoCancellation: true,
+      },
+      video: false,
+    })
       .then((stream) => {
         setEnabledMic(true);
-        const mediaRecorder = new window.MediaRecorder(stream);
-        mediaRecorder.addEventListener('dataavailable', appendAudioChunks);
-        mediaRecorder.addEventListener('stop', onFinish);
+        const mediaRecorder = new RecordRTC(stream, {
+          type: 'audio',
+          timeSlice: 1500,
+          recorderType: StereoAudioRecorder,
+          ondataavailable: (blob) => setAudioChunk(blob),
+        });
         setRecorder(mediaRecorder);
       })
       .catch((err) => {
         setEnabledMic(false);
         console.warn(err);
       });
-  }, [maxTrackLength]);
+  });
 
+  // update audioBuffer when new chunk is present
+  useEffect(() => {
+    if (audioChunk == null) {
+      return;
+    }
+    const fileReader = new FileReader();
+    const createNewBuffer = (d) => {
+      const newBuffer = appendBuffer(context, audioBuffer, d);
+      setAudioBuffer(newBuffer);
+    };
+    const handleError = (err) => console.warn(err);
+    const onBlob = () => {
+      context.decodeAudioData(fileReader.result, createNewBuffer, handleError);
+    };
+    fileReader.addEventListener('load', onBlob);
+    fileReader.readAsArrayBuffer(audioChunk);
+  }, [audioChunk]);
 
+  // update rms when new buffer is present
+  useEffect(() => {
+    const waveform = calculateRMSWaveform(audioBuffer, 512, maxTrackLength);
+    const newMeta = {
+      ...createTrackMeta(false, audioBuffer),
+      rms: waveform,
+    };
+    setTrackMeta({ source: key, meta: newMeta });
+  }, [audioBuffer]);
+
+  // update audio recorder state when playstate changes
   useEffect(() => {
     if (recorder == null || !enabledMic) {
       return;
     }
     switch (playState) {
       case PlayStates.Playing:
-        recorder.state === 'inactive'
-          ? recorder.start(600)
-          : recorder.resume();
+        recorder.getState() === 'inactive'
+          ? recorder.startRecording()
+          : recorder.resumeRecording();
         break;
       case PlayStates.Ended:
       case PlayStates.Unstarted:
-        recorder.stop();
+        recorder.stopRecording();
+        onFinish();
         break;
       case PlayStates.Paused:
-        recorder.pause();
+        recorder.pauseRecording();
         break;
     }
-  }, [playState]);
+  }, [playState, recorder]);
+
+  // do something when recording ends
+  const onFinish = () => {
+    // something
+  };
 
   return {
     meta,
     track,
     recorder,
     enabledMic,
-    audioChunks,
+    audioBuffer,
     solo: onSolo,
     mute: onMute,
     unsolo: onUnsolo,
