@@ -16,17 +16,11 @@ const masteredSources = Object.values(mastered).filter((s) => typeof s === 'stri
 function App() {
   return (
     <div className="screen-wrap">
-      {/* <Multitrek
-        controls={Transport}
-        track={Track}
-        sources={masteredSources}
-      /> */}
-
       <Multitrek>
         <Transport />
         <div className='multitrek__tracks'>
           {
-            masteredSources.map((source) => <Track key={source} source={source} />)
+            masteredSources.map((source) => <Track key={source} source={source} normalize />)
           }
           <RecordingTrack />
         </div>

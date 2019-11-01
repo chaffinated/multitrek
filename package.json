@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "export NODE_ENV=test && babel-tape-runner src/__tests__/index.js | tap-spec",
-    "start": "parcel ./testapp/index.html"
+    "start": "parcel ./testapp/index.html",
+    "build": "parcel build ./testapp/index.html --public-url ~/React/multitrek/dist"
   },
   "keywords": [
     "react",

@@ -6,6 +6,7 @@ import Waveform from './Waveform';
 
 interface TrackProps {
   source: string;
+  normalize: boolean;
   setTime: (audio: any) => void;
 }
 
@@ -15,7 +16,7 @@ const SOLO_BUTTON_CLASS = `${BUTTON_CLASS} multitrek__track__control--solo`;
 
 
 function Track(props: TrackProps) {
-  const { source } = props;
+  const { source, normalize } = props;
   const {
     meta,
     track,
@@ -54,11 +55,16 @@ function Track(props: TrackProps) {
 
       <Waveform
         rms={meta.rms}
+        normalize={normalize}
         muted={!shouldMakeNoise}
         playState={playState}
       />
     </div>
   );
 }
+
+Track.defaultProps = {
+  normalize: false,
+};
 
 export default Track;

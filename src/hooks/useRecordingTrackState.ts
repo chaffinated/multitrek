@@ -81,7 +81,6 @@ export default () => {
     window.navigator.mediaDevices.getUserMedia({
       audio: {
         channelCount: 2,
-        sampleRate: 48000,
         echoCancellation: true,
       },
       video: false,
@@ -130,6 +129,14 @@ export default () => {
     setTrackMeta({ source: key, meta: newMeta });
   }, [audioBuffer]);
 
+  // do something when recording ends
+  const onFinish = () => {
+    // something
+    recorder.reset();
+    setAudioChunk(null);
+    setAudioBuffer(context.createBuffer(1, 1, 44100));
+  };
+
   // update audio recorder state when playstate changes
   useEffect(() => {
     if (recorder == null || !enabledMic) {
@@ -137,7 +144,8 @@ export default () => {
     }
     switch (playState) {
       case PlayStates.Playing:
-        recorder.getState() === 'inactive'
+        const recorderState = recorder.getState();
+        recorderState === 'inactive' || recorderState === 'stopped'
           ? recorder.startRecording()
           : recorder.resumeRecording();
         break;
@@ -151,11 +159,6 @@ export default () => {
         break;
     }
   }, [playState, recorder]);
-
-  // do something when recording ends
-  const onFinish = () => {
-    // something
-  };
 
   return {
     meta,

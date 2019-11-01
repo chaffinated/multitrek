@@ -5,6 +5,7 @@ import { PlayStates } from './types';
 interface WaveformProps {
   rms: number[];
   muted: boolean;
+  normalize: boolean;
   playState: PlayStates;
 }
 
@@ -13,17 +14,17 @@ const HALF_HEIGHT = HEIGHT / 2;
 const SVG_CLASS = `multitrek__waveform__svg`;
 
 function Waveform(props: WaveformProps) {
-  const { rms, muted } = props;
+  const { rms, muted, normalize } = props;
   const width = rms.length;
   const bars = React.useMemo(() => {
-    const normalizedWaveform = normalizeRMSWaveform(rms);
+    const waveform = normalize ? normalizeRMSWaveform(rms) : rms;
     const res = [];
     let x;
     let height;
     let y;
-    for (let i = 0; i < normalizedWaveform.length; i++) {
+    for (let i = 0; i < waveform.length; i++) {
       x = i;
-      height = normalizedWaveform[i] * HEIGHT;
+      height = waveform[i] * HEIGHT;
       y = HALF_HEIGHT - height / 2;
       res.push(<rect className={`${SVG_CLASS}__sample`} key={i} x={x} y={y} width={1} height={height} />);
     }
@@ -60,5 +61,9 @@ function Waveform(props: WaveformProps) {
     </div>
   );
 }
+
+Waveform.defaultProps = {
+  normalize: false,
+};
 
 export default Waveform;
