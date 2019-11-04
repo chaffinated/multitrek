@@ -1,6 +1,6 @@
-import React from 'react';
-import { ActionTypes } from '../../src/state';
+import React, { useContext } from 'react';
 import { PlayStates, MultitrekState } from '../../src/types';
+import { ActionTypes, MultitrekContext } from '../../src';
 
 
 interface ControlsProps {
@@ -28,9 +28,9 @@ const KnobSizes = {
 };
 
 function Controls(props: ControlsProps) {
-  const { playState, play, stop, pause, multitrekState, maxTrackDuration, dispatch } = props;
-  const { currentTime } = multitrekState;
-  const { tracks } = multitrekState;
+  const multitrekContext = useContext(MultitrekContext);
+  const { state, play, pause, stop, dispatch, maxTrackDuration } = multitrekContext;
+  const { playState, currentTime, tracks } = state;
   const playheadPosition = currentTime / maxTrackDuration * 100;
   const disableStop = [PlayStates.Playing, PlayStates.Unstarted].includes(playState);
 
@@ -39,12 +39,12 @@ function Controls(props: ControlsProps) {
 
   const handleMouseOver = () => setShouldCursorDisplay(true);
   const handleMouseLeave = () => setShouldCursorDisplay(false);
-  const handleMouseMove = (e: MouseEvent) => {
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     const { clientX } = e;
     const { left } = (e.currentTarget as HTMLElement).getBoundingClientRect();
     setCursorPosition(clientX - left);
   };
-  const handleClick = (e: MouseEvent) => {
+  const handleClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
     const { left, width } = (e.currentTarget as HTMLElement).getBoundingClientRect();
     dispatch({ type: ActionTypes.Seek, payload: (e.clientX - left) / width * maxTrackDuration });
   };

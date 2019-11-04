@@ -4,6 +4,11 @@ import MultitrekContext from '../MultitrekContext';
 import { TrackState, TrackMetaState, PlayStates } from '../types';
 import { calculateRMSWaveform } from '../utils';
 
+interface RecordingStateProps {
+  onFinish?: (blob: Blob) => any;
+}
+
+
 const createTrack = (key?: symbol): TrackState => ({
   key,
   source: null,
@@ -34,7 +39,8 @@ const appendBuffer = (ctx: AudioContext, buf1: AudioBuffer, buf2: AudioBuffer) =
 };
 
 
-export default () => {
+export default (props: RecordingStateProps = {}) => {
+  const { onFinish: finishWithBlob } = props;
   const multitrekContext = useContext(MultitrekContext);
   const {
     state,
@@ -72,6 +78,7 @@ export default () => {
     setTrackMeta({ source: key, meta: createTrackMeta(false) });
   }, [key, state.activated]);
 
+
   // request mic permissions and create recorder
   useEffect(() => {
     if (recorder != null) {
@@ -101,6 +108,7 @@ export default () => {
       });
   });
 
+
   // update audioBuffer when new chunk is present
   useEffect(() => {
     if (audioChunk == null) {
@@ -119,6 +127,7 @@ export default () => {
     fileReader.readAsArrayBuffer(audioChunk);
   }, [audioChunk]);
 
+
   // update rms when new buffer is present
   useEffect(() => {
     const waveform = calculateRMSWaveform(audioBuffer, 512, maxTrackLength);
@@ -129,13 +138,17 @@ export default () => {
     setTrackMeta({ source: key, meta: newMeta });
   }, [audioBuffer]);
 
+
   // do something when recording ends
-  const onFinish = () => {
-    // something
+  const onFinish = (blob) => {
+    if (finishWithBlob && audioChunk != null) {
+      finishWithBlob(blob);
+    }
     recorder.reset();
     setAudioChunk(null);
     setAudioBuffer(context.createBuffer(1, 1, 44100));
   };
+
 
   // update audio recorder state when playstate changes
   useEffect(() => {
@@ -151,8 +164,7 @@ export default () => {
         break;
       case PlayStates.Ended:
       case PlayStates.Unstarted:
-        recorder.stopRecording();
-        onFinish();
+        recorder.stopRecording(onFinish);
         break;
       case PlayStates.Paused:
         recorder.pauseRecording();

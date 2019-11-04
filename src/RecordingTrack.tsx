@@ -3,13 +3,17 @@ import cn from 'classnames';
 import { useRecordingTrackState } from './hooks';
 import Waveform from './Waveform';
 
+interface RecordingTrackProps {
+  onFinish: (blob: Blob) => any;
+}
 
 const BUTTON_CLASS = 'multitrek__track__control';
 const MUTE_BUTTON_CLASS = `${BUTTON_CLASS} multitrek__track__control--mute`;
 const SOLO_BUTTON_CLASS = `${BUTTON_CLASS} multitrek__track__control--solo`;
 
 
-function RecordingTrack() {
+function RecordingTrack(props: RecordingTrackProps) {
+  const { onFinish } = props;
   const {
     meta,
     track,
@@ -19,7 +23,7 @@ function RecordingTrack() {
     unmute,
     enabledMic,
     multitrekContext,
-  } = useRecordingTrackState();
+  } = useRecordingTrackState({ onFinish });
   const { state } = multitrekContext;
   const { playState } = state;
 
