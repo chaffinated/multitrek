@@ -17,6 +17,7 @@ import trackSource from './audio/hanging-on.mp3';
 
 function App() {
   const handleFinishRecording = (blobUrl) => {
+    console.log(blobUrl);
     window.open(blobUrl, '_blank');
   };
 

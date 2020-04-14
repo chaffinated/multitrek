@@ -5,7 +5,7 @@ import { PlayStates } from './types';
 interface WaveformProps {
   rms: number[];
   muted: boolean;
-  normalize: boolean;
+  normalize?: boolean;
   playState: PlayStates;
 }
 

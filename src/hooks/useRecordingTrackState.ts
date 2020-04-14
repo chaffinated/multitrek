@@ -86,10 +86,7 @@ export default (props: RecordingStateProps = {}) => {
     }
 
     window.navigator.mediaDevices.getUserMedia({
-      audio: {
-        channelCount: 2,
-        echoCancellation: true,
-      },
+      audio: true,
       video: false,
     })
       .then((stream) => {
@@ -104,7 +101,8 @@ export default (props: RecordingStateProps = {}) => {
       })
       .catch((err) => {
         setEnabledMic(false);
-        console.warn(err);
+        // console.warn(err);
+        throw err;
       });
   });
 
